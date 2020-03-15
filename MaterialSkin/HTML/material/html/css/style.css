@@ -837,6 +837,11 @@ progress {
  border:0;
 }
 
+.bgnd-blur {
+ backdrop-filter: blur(10px);
+ background:none!important;
+}
+
 .bgnd-cover {
  background-size:cover !important;
  background-repeat:no-repeat !important;

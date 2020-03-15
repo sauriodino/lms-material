@@ -241,7 +241,8 @@ var lmsQueue = Vue.component("lms-queue", {
    <v-btn :title="trans.clear | tooltip(LMS_CLEAR_QUEUE_KEYBOARD,keyboardControl)" flat icon @click="clear()" class="toolbar-button"><img class="svg-list-img" :src="'queue-clear' | svgIcon(darkUi)"></img></v-btn>
   </v-layout>
  </div>
- <v-list class="lms-list-sub bgnd-cover" id="queue-list" v-bind:class="{'lms-list-sub3':threeLines}">
+ <div class="bgnd-cover" id="queue-bgnd">
+ <v-list class="lms-list-sub bgnd-blur" id="queue-list" v-bind:class="{'lms-list-sub3':threeLines}">
  <RecycleScroller v-if="items.length>LMS_MAX_NON_SCROLLER_ITEMS && threeLines" :items="items" :item-size="LMS_LIST_3LINE_ELEMENT_SIZE" page-mode key-field="key">
    <v-list-tile avatar v-bind:class="{'pq-current': index==currentIndex}" @dragstart="dragStart(index, $event)" @dragend="dragEnd()" @dragover="dragOver($event)" @drop="drop(index, $event)" draggable @click="click(item, index, $event)" slot-scope="{item, index}" key-field="key">
     <v-list-tile-avatar :tile="true" v-bind:class="{'radio-image': 0==item.duration}" class="lms-avatar">
@@ -298,6 +299,7 @@ var lmsQueue = Vue.component("lms-queue", {
   </template>
   <v-list-tile v-if="IS_IOS" class="lms-list-pad"></v-list-tile>
  </v-list>
+ </div>
 
  <v-menu offset-y v-model="menu.show" :position-x="menu.x" :position-y="menu.y">
   <v-list v-if="menu.item">
@@ -462,7 +464,6 @@ var lmsQueue = Vue.component("lms-queue", {
         bus.$on('esc', function() {
             this.menu.show = false;
         }.bind(this));
-
         this.scrollElement = document.getElementById("queue-list");
         this.scrollElement.addEventListener('scroll', this.scrollHandler);
 
@@ -996,7 +997,7 @@ var lmsQueue = Vue.component("lms-queue", {
             this.dragIndex = undefined;
         },
         setBgndCover() {
-            setBgndCover(this.scrollElement, this.$store.state.queueBackdrop ? this.coverUrl : undefined);
+            setBgndCover(document.getElementById("queue-bgnd"), this.$store.state.queueBackdrop ? this.coverUrl : undefined);
             // Check for cover changes in radio streams...
             if (this.coverUrl && undefined!=this.coverTrackIndex && this.coverTrackIndex>=0 && this.coverTrackIndex<this.items.length) {
                 var resizedUrl = changeImageSizing(this.coverUrl, LMS_IMAGE_SIZE);

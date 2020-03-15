@@ -78,13 +78,13 @@ var lmsBrowse = Vue.component("lms-browse", {
  <v-progress-circular class="browse-progress" v-if="fetchingItems" color="primary" size=72 width=6 indeterminate></v-progress-circular>
  <div v-show="letter" id="letterOverlay"></div>
 
- <div v-if="grid.use">
-  <div class="noselect bgnd-cover lms-jumplist" v-bind:class="{'lms-jumplist-wide':jumplistWide}" v-if="filteredJumplist.length>1">
+ <div v-if="grid.use" class="bgnd-cover" id="browse-bgnd">
+  <div class="noselect bgnd-blur lms-jumplist" v-bind:class="{'lms-jumplist-wide':jumplistWide}" v-if="filteredJumplist.length>1">
    <template v-for="(item, index) in filteredJumplist">
     <div @click="jumpTo(item)" v-bind:class="{'active-btn' : jumplistActive==index}">{{item.key==' ' || item.key=='' ? '?' : item.key}}</div>
    </template>
   </div>
-  <div class="lms-image-grid noselect bgnd-cover" id="browse-grid" style="overflow:auto;" v-bind:class="{'lms-image-grid-jump': filteredJumplist.length>1}">
+  <div class="lms-image-grid noselect bgnd-blur" id="browse-grid" style="overflow:auto;" v-bind:class="{'lms-image-grid-jump': filteredJumplist.length>1}">
   <RecycleScroller :items="grid.rows" :item-size="grid.ih - (grid.haveSubtitle ? 0 : GRID_SINGLE_LINE_DIFF)" page-mode key-field="id">
    <div slot-scope="{item, index}" :class="[grid.few ? 'image-grid-few' : 'image-grid-full-width']">
     <div align="center" style="vertical-align: top" v-for="(idx, cidx) in item.indexes">
@@ -109,15 +109,15 @@ var lmsBrowse = Vue.component("lms-browse", {
    </div>
   </RecycleScroller>
  </div></div>
- <div v-else>
+ <div v-else class="bgnd-cover" id="browse-bgnd">
 
- <div class="noselect bgnd-cover lms-jumplist" v-bind:class="{'lms-jumplist-wide':jumplistWide}" v-if="filteredJumplist.length>1">
+ <div class="noselect bgnd-blur lms-jumplist" v-bind:class="{'lms-jumplist-wide':jumplistWide}" v-if="filteredJumplist.length>1">
   <template v-for="(item, index) in filteredJumplist">
    <div @click="jumpTo(item)" v-bind:class="{'active-btn' : jumplistActive==index}">{{item.key==' ' || item.key=='' ? '?' : item.key}}</div>
   </template>
  </div>
 
- <v-list class="bgnd-cover" v-bind:class="{'lms-list': !headerTitle, 'lms-list-sub': headerTitle, 'lms-list-jump': filteredJumplist.length>1}" id="browse-list">
+ <v-list class="bgnd-blur" v-bind:class="{'lms-list': !headerTitle, 'lms-list-sub': headerTitle, 'lms-list-jump': filteredJumplist.length>1}" id="browse-list">
   <RecycleScroller v-if="!isTop && ((grid.allowed && current.id!=TOP_RADIO_ID && current.id!=TOP_APPS_ID) || items.length>LMS_MAX_NON_SCROLLER_ITEMS)" :items="items" :item-size="LMS_LIST_ELEMENT_SIZE" page-mode key-field="id">
    <v-list-tile avatar @click="click(item, index, $event)" slot-scope="{item, index}" @dragstart="dragStart(index, $event)" @dragend="dragEnd()" @dragover="dragOver($event)" @drop="drop(index, $event)" :draggable="item.draggable && (current.section!=SECTION_FAVORITES || 0==selection.size)" v-bind:class="{'browse-header' : item.header}">
     <v-list-tile-avatar v-if="item.selected" :tile="true" class="lms-avatar">
@@ -2503,7 +2503,7 @@ var lmsBrowse = Vue.component("lms-browse", {
             if (url) {
                url=changeImageSizing(url, LMS_CURRENT_IMAGE_SIZE);
             }
-            setBgndCover(this.scrollElement, url);
+            setBgndCover(document.getElementById("browse-bgnd"), url);
         },
         enableRatings() {
             this.showRatingButton = (this.$store.state.ratingsSupport && this.items.length>0 &&
