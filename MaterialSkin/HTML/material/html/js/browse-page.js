@@ -2208,11 +2208,9 @@ var lmsBrowse = Vue.component("lms-browse", {
         pin(item, add, mapped) {
             var index = -1;
             var lastPinnedIndex = -1;
-            var title = item.title;
             var id = item.id;
             var modified = false;
             if (this.current && TOP_MYMUSIC_ID==this.current.id && this.libraryName && this.$store.state.library && this.$store.state.library!=LMS_DEFAULT_LIBRARY && getField(item, "library_id:")<0) {
-                title = title+SEPARATOR+this.libraryName;
                 id = id+this.$store.state.library;
                 modified = true;
             }
@@ -2246,7 +2244,7 @@ var lmsBrowse = Vue.component("lms-browse", {
                 } else {
                     var command = this.buildCommand(item, undefined, false);
                     this.top.splice(lastPinnedIndex+1, 0,
-                                    {id: id, title: title, image: item.image, icon: item.icon, svg: item.svg, mapgenre: item.mapgenre,
+                                    {id: id, title: item.title, subtitle: modified ? this.libraryName : undefined, image: item.image, icon: item.icon, svg: item.svg, mapgenre: item.mapgenre,
                                      command: command.command, params: command.params, isPinned: true, menu: [RENAME_ACTION, UNPIN_ACTION],
                                      weight: undefined==item.weight ? 10000 : item.weight, section: item.section, cancache: item.cancache});
                     // If pinning a 'My Music' item and have a chosen library, then save its ID and update pinned name
@@ -2257,7 +2255,7 @@ var lmsBrowse = Vue.component("lms-browse", {
                 this.options.pinned.add(id);
                 this.updateItemPinnedState(item);
                 this.saveTopList();
-                bus.$emit('showMessage', i18n("Pinned '%1' to home screen.", title));
+                bus.$emit('showMessage', i18n("Pinned '%1' to home screen.", item.title));
             } else if (!add && index!=-1) {
                 this.$confirm(i18n("Un-pin '%1'?", item.title), {buttonTrueText: i18n('Un-pin'), buttonFalseText: i18n('Cancel')}).then(res => {
                     if (res) {
