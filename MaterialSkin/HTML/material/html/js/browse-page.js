@@ -1924,12 +1924,16 @@ var lmsBrowse = Vue.component("lms-browse", {
                         if (undefined!=id && (""+id)!="") {
                             haveLibId = true;
                             cmd.libraryId = id;
+                            console.log("HAVE LIB ID", id);
                             break;
                         }
                     }
                 }
                 if (!haveLibId) { // Command does not have library_id. Use lib from parent command (if set), or user's chosen library
-                    var libId = this.currentLibId ? this.currentLibId : this.$store.state.library ? this.$store.state.library : LMS_DEFAULT_LIBRARY;
+                    // Only use chose virtual library if we are navigating from 'My Music', otherwise use default library
+                    var useMyMusicLib = (this.current && this.current.id==TOP_MYMUSIC_ID) || (this.history.length>1 && this.history[1].current && this.history[1].id==TOP_MYMUSIC_ID);
+                    var libId = this.currentLibId ? this.currentLibId : useMyMusicLib && this.$store.state.library ? this.$store.state.library : LMS_DEFAULT_LIBRARY;
+                    console.log("XX", useMyMusicLib, libId);
                     if (libId) {
                         cmd.params.push("library_id:"+libId);
                         cmd.libraryId = libId;
@@ -2220,6 +2224,7 @@ var lmsBrowse = Vue.component("lms-browse", {
                         return;
                     }
                 }
+                var name = item.title;
                 if (item.isRadio) {
                     this.top.splice(lastPinnedIndex+1, 0,
                                     {id: item.presetParams.favorites_url, title: item.title, image: item.image, icon: item.icon, svg: item.svg, isPinned: true,
@@ -2231,11 +2236,17 @@ var lmsBrowse = Vue.component("lms-browse", {
                                     {id: item.id, title: item.title, image: item.image, icon: item.icon, svg: item.svg, mapgenre: item.mapgenre,
                                      command: command.command, params: command.params, isPinned: true, menu: [RENAME_ACTION, UNPIN_ACTION],
                                      weight: undefined==item.weight ? 10000 : item.weight, section: item.section, cancache: item.cancache});
+                    // If pinning a 'My Music' item and have a chosen library, then save its ID and update pinned name
+                    if (this.current && TOP_MYMUSIC_ID==this.current.id && this.libraryName && this.$store.state.library && this.$store.state.library!=LMS_DEFAULT_LIBRARY && getField(item, "library_id:")<0) {
+                        this.top[lastPinnedIndex+1].params.push("library_id:"+this.$store.state.library);
+                        this.top[lastPinnedIndex+1].title+=SEPARATOR+this.libraryName;
+                        name = this.top[lastPinnedIndex+1].title;
+                    }
                 }
                 this.options.pinned.add(item.id);
                 this.updateItemPinnedState(item);
                 this.saveTopList();
-                bus.$emit('showMessage', i18n("Pinned '%1' to home screen.", item.title));
+                bus.$emit('showMessage', i18n("Pinned '%1' to home screen.", name));
             } else if (!add && index!=-1) {
                 this.$confirm(i18n("Un-pin '%1'?", item.title), {buttonTrueText: i18n('Un-pin'), buttonFalseText: i18n('Cancel')}).then(res => {
                     if (res) {
