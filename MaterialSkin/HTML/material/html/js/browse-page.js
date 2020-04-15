@@ -2271,13 +2271,21 @@ var lmsBrowse = Vue.component("lms-browse", {
             if (item.menu) {
                 for (var i=0, len=item.menu.length; i<len; ++i) {
                     if (item.menu[i] == PIN_ACTION || item.menu[i] == UNPIN_ACTION) {
-                        item.menu[i] = item.menu[i] == PIN_ACTION ? UNPIN_ACTION : PIN_ACTION;
+                        var id = item.id;
+                        if (id.startsWith(MUSIC_ID_PREFIX) && this.$store.state.library && this.$store.state.library!=LMS_DEFAULT_LIBRARY && getField(item, "library_id:")) {
+                            id+=this.$store.state.library;
+                        }
+                        item.menu=[this.options.pinned.has(id) ? UNPIN_ACTION : PIN_ACTION];
                         break;
                     }
                 }
                 if (item.id.startsWith(TOP_ID_PREFIX)) {
                     for (var i=0, len=this.myMusic.length; i<len; ++i) {
-                        this.myMusic[i].menu=[this.options.pinned.has(this.myMusic[i].id) ? UNPIN_ACTION : PIN_ACTION];
+                        var id = this.myMusic[i].id;
+                        if (id.startsWith(MUSIC_ID_PREFIX) && this.$store.state.library && this.$store.state.library!=LMS_DEFAULT_LIBRARY && getField(this.myMusic[i], "library_id:")) {
+                            id+=this.$store.state.library;
+                        }
+                        this.myMusic[i].menu=[this.options.pinned.has(id) ? UNPIN_ACTION : PIN_ACTION];
                     }
                 }
             }
