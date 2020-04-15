@@ -1925,7 +1925,6 @@ var lmsBrowse = Vue.component("lms-browse", {
                         if (undefined!=id && (""+id)!="") {
                             haveLibId = true;
                             cmd.libraryId = id;
-                            console.log("HAVE LIB ID", id);
                             break;
                         }
                     }
@@ -1934,7 +1933,6 @@ var lmsBrowse = Vue.component("lms-browse", {
                     // Only use chose virtual library if we are navigating from 'My Music', otherwise use default library
                     var useMyMusicLib = (this.current && this.current.id==TOP_MYMUSIC_ID) || (this.history.length>1 && this.history[1].current && this.history[1].id==TOP_MYMUSIC_ID);
                     var libId = this.currentLibId ? this.currentLibId : useMyMusicLib && this.$store.state.library ? this.$store.state.library : LMS_DEFAULT_LIBRARY;
-                    console.log("XX", useMyMusicLib, libId);
                     if (libId) {
                         cmd.params.push("library_id:"+libId);
                         cmd.libraryId = libId;
